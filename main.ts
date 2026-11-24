@@ -13,6 +13,23 @@ import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 const fortune =
   'A human will say "just one small change" — it will cost 40,000 tokens and your whole context window.';
 
+// Entry gate: the kit requires a non-empty, exactly-one-line fortune of
+// at most 140 characters. Fail loudly instead of writing an invalid entry.
+function validateEntry(text: string): void {
+  if (text.length === 0) {
+    throw new Error("entry must be non-empty");
+  }
+  if (text.split("\n").length !== 1) {
+    throw new Error("entry must be exactly 1 line");
+  }
+  if (text.length > 140) {
+    throw new Error(
+      `entry must be at most 140 characters (got ${text.length})`,
+    );
+  }
+}
+
+validateEntry(fortune);
 mkdirSync("/output", { recursive: true });
 writeFileSync("/output/entry.txt", fortune + "\n", "utf8");
 chmodSync("/output/entry.txt", 0o644);
